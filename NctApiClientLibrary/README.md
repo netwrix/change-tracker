@@ -186,8 +186,8 @@ Remove-Module NctApiClientLibrary
 
 ## Examples
 
-A scrip to trim specific prefixes and suffixes from device names
-```powershel
+A script to trim specific prefixes and suffixes from device names
+```powershell
 
 $devices = Get-NctDevices -name "ThePrefix*TheSuffix" 
 
