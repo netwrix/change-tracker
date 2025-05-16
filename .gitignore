@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+bin/
+obj/
+.DS_Store
+
+# IDE specific files
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Environment files
+.env
+.env.local
+.env.*.local
