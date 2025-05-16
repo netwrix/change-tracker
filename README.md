@@ -1,6 +1,6 @@
 # Netwrix Change Tracker Open Source Tools
 
-This repository contains open source tooling and libraries for the [Netwrix Change Tracker product](https://www.netwrix.com/security_configuration_management_software.html).
+This repository contains open source tooling and libraries for the [Netwrix Change Tracker](https://www.netwrix.com/security_configuration_management_software.html) product.
 
 ## Purpose
 
