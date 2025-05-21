@@ -30,13 +30,7 @@
     Description = 'Secure API client library for interacting with Netwrix Change Tracker Hub'
     
     # Minimum version of the PowerShell engine required by this module
-    PowerShellVersion = '7.4'
-    
-    # Required modules that must be imported in the global scope
-    RequiredModules = @(
-        @{ ModuleName = 'Microsoft.PowerShell.Security'; ModuleVersion = '7.4.0' }
-        @{ ModuleName = 'Microsoft.PowerShell.Utility'; ModuleVersion = '7.4.0' }
-    )
+    PowerShellVersion = '7.4' 
     
     # Required assemblies that must be loaded prior to importing this module
     RequiredAssemblies = @(

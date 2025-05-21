@@ -40,14 +40,12 @@ Function New-NctApiCredential {
         [string]$user,
             
         [Parameter(Position=2, mandatory=$false)]
-        [switch]$persist = $false,
-
-        [Parameter(Position=3, mandatory=$false)]
-        [string]$path = "$env:USERPROFILE\.nct client library"           
+        [switch]$persist = $false          
     )
 
     if ($persist)
     {
+        $path = "$env:USERPROFILE\.nct client library" 
         $file = "$path\$user.dat"
 
         # If file does not exist, create a new credential and write it out

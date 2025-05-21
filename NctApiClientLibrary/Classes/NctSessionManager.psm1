@@ -16,7 +16,7 @@ class NctSessionManager {
     [string]$Username
     [Microsoft.PowerShell.Commands.WebRequestSession]$Session
     [datetime]$SessionCreatedTime
-    [int]$SessionTimeoutMinutes = 15
+    [int]$SessionTimeoutMinutes = 10
     [bool]$SkipCertificateCheck
 
     # Constructor
@@ -77,15 +77,18 @@ class NctSessionManager {
             $errorDetails = $_.Exception.Response.StatusDescription
 
             # Don't expose sensitive error details
-            switch ($statusCode) {
-                401 { throw "Authentication failed: Invalid credentials" }
-                403 { throw "Authentication failed: Access denied" }
-                404 { throw "Authentication failed: API endpoint not found" }
-                default { 
-                    Write-Verbose "Error details: $errorDetails"
-                    throw "Authentication failed: Network error occurred"
-                }
+            if ($statusCode -eq 401) {
+                throw "Authentication failed: Invalid credentials"
             }
+            if ($statusCode -eq 403) {
+                throw "Authentication failed: Access denied"
+            }
+            if ($statusCode -eq 404) {
+                throw "Authentication failed: API endpoint not found"
+            }
+
+            Write-Verbose "Error details: $errorDetails"
+            throw "Authentication failed: Network error occurred"
         }
         catch [System.Security.Authentication.AuthenticationException] {
             $this.Cleanup()
@@ -138,10 +141,13 @@ class NctSessionManager {
     # Get credentials
     [System.Net.NetworkCredential] GetCredentials() {
         try {
-            if ($Global:NctApiCredentialPath -and (Test-Path $Global:NctApiCredentialPath)) {
+            $path = "$env:USERPROFILE\.nct client library\$($this.Username).dat" 
+            if ($path -and (Test-Path $path)) {
+                Write-Verbose "Reading credentials from $path"
                 return New-NctApiCredential -user $this.Username -persist
             }
             else {
+                Write-Verbose "Credentials not found at $path"
                 return New-NctApiCredential -user $this.Username
             }
         }
@@ -154,10 +160,10 @@ class NctSessionManager {
     # Clean up session
     [void] Cleanup() {
         if ($this.Session) {
-            $this.Session.Clear()
+            $this.Session.Dispose()
             $this.Session = $null
         }
-        $this.SessionCreatedTime = $null
+        #$this.SessionCreatedTime = [datetime]::MinValue
     }
 
     # Static method to create a new session
