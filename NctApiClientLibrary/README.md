@@ -47,7 +47,6 @@ Example out put when calling Get-NctAgents without persisted credentials:
 
 Get-Nctagents
 
-No credential files found in C:\Users\JamesAnderson\.nct client library.
 URL (HTTPS://YourNctHubHostName/api): https://localhost/api
 User: james
 Password can be persisted with:
@@ -57,7 +56,7 @@ Enter Password:
 
 ```
 
-The client library will prompt for the url, user and before asking for the password it describes how the password can be persisted. The url and user will be persisted in global variables (see global variable section below).
+The client library will prompt for the url and user. Before asking for the password it will describe how the password can be persisted. The url and user will be persisted in global variables (see global variable section below) and will not need to be entered again unless the values need to be changed.
 
 Passwords are hidden with asterisks to avoid them leaking into command prompt history.
 

@@ -1,3 +1,7 @@
+# Import required modules
+Import-Module Microsoft.PowerShell.Security
+Import-Module Microsoft.PowerShell.Utility
+
 # Load functions
 $FunctionFiles = Get-ChildItem -Path $PSScriptRoot\Functions\*.ps1 -File
 

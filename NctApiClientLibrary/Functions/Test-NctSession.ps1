@@ -22,8 +22,9 @@ Function Test-NctSession {
     $userNameExists = Test-Path variable:global:NctUserName
     $SkipCertificateCheckExists = Test-Path variable:global:NctSkipCertificateCheck
 
-    # If any of the global variables do not exist then check for a credential file in $env:USERPROFILE\.nct client library
-    # If no credential file found then prompt user for the Hub URL and username
+    # If any of the global variables do not exist then attempt to create a new session to repair the damage.
+    # Check for a credential file in $env:USERPROFILE\.nct client library.
+    # If no credential file found then prompt user for the Hub URL and username.
     if 
     ( (-not $urlExists) -or (-not $sessionExists) -or (-not $sessionCreatedTimeExists) -or (-not $userNameExists) -or (-not $SkipCertificateCheckExists))
     {
@@ -33,6 +34,8 @@ Function Test-NctSession {
         Write-Verbose "Session create time found: $sessionCreatedTimeExists"
         Write-Verbose "Username found: $userNameExists"
         Write-Verbose "SkipCertificateCheck setting found: $SkipCertificateCheckExists"
+
+        Write-Verbose "Creating new session"
 
         # Create the "$env:USERPROFILE\.nct client library" directory if it does not exist
         if (-not (Test-Path -Path "$env:USERPROFILE\.nct client library"))
@@ -90,7 +93,7 @@ Function Test-NctSession {
         }
         else
         {
-            Write-Output "No credential files found in $env:USERPROFILE\.nct client library."
+            Write-Verbose "No credential files found in $env:USERPROFILE\.nct client library."
 
             # Prompt user for the Hub URL, username and password
             New-NctSession 

@@ -68,18 +68,15 @@ Function New-NctSession {
         }
     }
 
-    Write-Verbose "Acquiring User Session for $user to $uri"
-
     # Use the session manager to create and manage the session
+    Write-Verbose "Creating session manager for $user to $url"
     $sessionManager = [NctSessionManager]::new($url, $user, $SkipCertificateCheck)
+
+    Write-Verbose "Acquiring User Session for $user to $url"
     $session = $sessionManager.NewSession()
 
     if ($session) {
         $Global:NctSession = $session
         $Global:NctSessionCreatedTime = $sessionManager.SessionCreatedTime
-        return $session
-    }
-    else {
-        return $null
     }
 }
