@@ -20,7 +20,7 @@ Function Remove-NctProxiedDevice {
         [string]$name          
     )
 
-    Test-NctSession    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     $uri = "$Global:NctHubUrl/devices/delete"
 

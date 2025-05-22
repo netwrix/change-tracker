@@ -20,7 +20,7 @@ Function Update-NctDevice {
         [string]$newName
     )
     
-    Test-NctSession    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     # There is no dedicated endpoint for devices as the data is here 
     $uri = "$Global:NctHubUrl/agents/update"

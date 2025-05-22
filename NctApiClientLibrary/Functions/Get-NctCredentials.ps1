@@ -32,7 +32,7 @@ Function Get-NctCredentials {
         [string]$name        
     )
 
-    Test-NctSession    
+    Test-NctSession -Verbose:$VerbosePreference    
 
     $body = 
 @"
