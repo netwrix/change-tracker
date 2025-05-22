@@ -17,7 +17,7 @@ Function Get-NctReports {
         [string]$name
     )
 
-    Test-NctSession    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     $uri = "$Global:NctHubUrl/reports/scheduled"
 

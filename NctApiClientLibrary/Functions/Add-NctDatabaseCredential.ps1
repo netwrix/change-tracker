@@ -31,7 +31,7 @@ Function Add-NctDatabaseCredential {
         [securestring]$password            
     )
 
-    Test-NctSession    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     $uri = "$Global:NctHubUrl/credentials/add"
     

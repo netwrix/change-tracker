@@ -20,7 +20,7 @@ Function Remove-NctCredential {
         [string]$name          
     )
 
-    Test-NctSession    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     $uri = "$Global:NctHubUrl/credentials/delete"
     

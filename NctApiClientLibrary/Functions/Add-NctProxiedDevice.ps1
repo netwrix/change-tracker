@@ -31,7 +31,7 @@ Function Add-NctProxiedDevice {
         # TODO: Add more params for DeviceType, HostType, etc
     )
 
-    Test-NctSession -v    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     $uri = "$Global:NctHubUrl/agents/register"
 

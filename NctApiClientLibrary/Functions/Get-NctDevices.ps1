@@ -20,7 +20,7 @@ Function Get-NctDevices {
         [switch]$IncludeDeletedDevices = $false
     )
     
-    Test-NctSession -v    
+    Test-NctSession -Verbose:$VerbosePreference    
     
     # There is no dedicated endpoint for devices as the data is here 
     $uri = "$Global:NctHubUrl/agentsRanked"
