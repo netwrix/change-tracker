@@ -73,7 +73,13 @@ Function New-NctSession {
     $sessionManager = [NctSessionManager]::new($url, $user, $SkipCertificateCheck)
 
     Write-Verbose "Acquiring User Session for $user to $url"
-    $session = $sessionManager.NewSession()
+    try {
+        $session = $sessionManager.NewSession()
+    }
+    catch {
+        Write-Error "Failed to acquire user session for $user to $url. $_"
+        return $null
+    }
 
     if ($session) {
         $Global:NctSession = $session

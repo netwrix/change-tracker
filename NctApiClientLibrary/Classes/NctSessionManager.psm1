@@ -34,13 +34,20 @@ class NctSessionManager {
                 Write-Verbose "Using existing valid session"
                 return $this.Session
             }
-
+            
             # Get credentials
             $credentials = $this.GetCredentials()
             if (-not $credentials) {
                 throw "Failed to get credentials"
             }
 
+            # Check if 2FA is required
+            $oneTimePasswordBody = ""
+            $oneTimePassword = $this.Check2FA($credentials)
+            if ($oneTimePassword) {
+                $oneTimePasswordBody = "&Meta={OneTimePassword: '$oneTimePassword'}"
+            }
+            
             # Create new session
             $uri = "$($this.HubUrl)/auth/credentials"
             Write-Verbose "Creating new session at $uri"
@@ -48,9 +55,10 @@ class NctSessionManager {
             $this.Session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
             $result = Invoke-RestMethod `
                 -Method Post `
+                -SslProtocol 'Tls12' `
                 -Uri $uri `
                 -Headers @{ Accept = 'application/json' } `
-                -Body "username=$($credentials.username)&password=$($credentials.Password)&format=json" `
+                -Body "username=$($credentials.username)&password=$($credentials.Password)&format=json$oneTimePasswordBody" `
                 -WebSession $this.Session `
                 -SkipCertificateCheck:$this.SkipCertificateCheck
 
@@ -97,7 +105,7 @@ class NctSessionManager {
         catch {
             $this.Cleanup()
             Write-Verbose "Error details: $_"
-            throw "Authentication failed: An unexpected error occurred"
+            throw "Authentication failed: $_"
         }
     }
 
@@ -144,16 +152,71 @@ class NctSessionManager {
             $path = "$env:USERPROFILE\.nct client library\$($this.Username).dat" 
             if ($path -and (Test-Path $path)) {
                 Write-Verbose "Reading credentials from $path"
-                return New-NctApiCredential -user $this.Username -persist
+                $ApiCredential = New-NctApiCredential -user $this.Username -persist
             }
             else {
                 Write-Verbose "Credentials not found at $path"
-                return New-NctApiCredential -user $this.Username
+                $ApiCredential = New-NctApiCredential -user $this.Username
+            }  
+
+            return $ApiCredential
+        }
+        catch {
+            throw "Credential retrieval error: $_"
+        }
+    }
+
+    [string] Check2FA([System.Net.NetworkCredential]$ApiCredential) {
+        $uri = "$($this.HubUrl)/api/users/twoFactorStatus" 
+        try {
+            Write-Verbose "Checking if 2FA is required"                     
+
+            $body = 
+@"
+{    
+    "UserName": "$($ApiCredential.UserName)",
+    "Password": "$($ApiCredential.Password)"
+}
+"@
+  
+            $result = Invoke-RestMethod `
+                -Method Post `
+                -Uri $uri `
+                -ContentType application/json `
+                -Body $body `
+                -SkipCertificateCheck:$this.SkipCertificateCheck
+
+            Write-Verbose "2FA check result: $result"
+
+            if ($result.TwoFactorRequired) { 
+                if ($result.TwoFactorRegistration -eq "Registering") {
+                    Write-Verbose "2 Factor Authentication is required"
+                    Write-Output "Using an authenticator app on your mobile device (eg Google Authenticator, Authy, LastPass, iPhone etc) scan the QR barcode found at the link below: "
+                    Write-Output ""
+                    Write-Output "$($result.SetupImageUrl)"
+                    Write-Output ""
+                    Write-Output "Alternatively manually enter the setup code below into the authenticator app to register Change Tracker with your mobile device: $($result.SetupCode)"
+                    Write-Output ""
+                    Read-Host "Press Enter when you have completed the 2FA setup"
+                }
+  
+                if ($result.TwoFactorRegistration -eq "Registered") {
+                    $OneTimePassword = Read-Host "Enter the one-time password from your authenticator app"
+                    return $OneTimePassword
+                }
+
+                # Return null to indicate that 2fa is required but the user is not registered yet
+                Write-Output "User is not registered for 2FA"
+                return $null
+            }   
+            else {
+                Write-Verbose "2FA is not required"
+                return $null
             }
         }
         catch {
-            Write-Verbose "Credential retrieval error: $_"
-            throw "Failed to retrieve credentials"
+            throw "2FA check failed: $_"
+            return $null
         }
     }
 
