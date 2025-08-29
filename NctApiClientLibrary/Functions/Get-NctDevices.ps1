@@ -28,7 +28,7 @@ Function Get-NctDevices {
     try
     {
         $response = Invoke-RestMethod `
-            -Method Get `
+            -Method Post `
             -ContentType application/json `
             -Uri $uri `
             -WebSession $global:NctSession `
@@ -78,9 +78,12 @@ Function Get-NctDevices {
         } 
         else 
         {
-            Throw "Failed to get devices. $_.Exception"
+            Throw "Failed to get devices. $_"
         }
 	
 	    exit 1
+    }
+    catch {
+        Throw "Failed to get devices. $_"
     }
 }
