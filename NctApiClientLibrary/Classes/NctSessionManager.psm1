@@ -42,11 +42,20 @@ class NctSessionManager {
             }
 
             # Check if 2FA is required
-            $oneTimePasswordBody = ""
             $oneTimePassword = $this.Check2FA($credentials)
-            if ($oneTimePassword) {
-                $oneTimePasswordBody = "&Meta={OneTimePassword: '$oneTimePassword'}"
-            }
+
+            # Build request 
+            $body = 
+@"
+{
+    "UserName": $($credentials.username),
+    "Password": $($credentials.Password),
+    "RememberMe": false,
+    "Meta": {
+        "OneTimePassword": $oneTimePassword
+    }
+}
+"@
             
             # Create new session
             $uri = "$($this.HubUrl)/auth/credentials"
@@ -55,10 +64,10 @@ class NctSessionManager {
             $this.Session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
             $result = Invoke-RestMethod `
                 -Method Post `
-                -SslProtocol 'Tls12' `
+                -ContentType application/json `
                 -Uri $uri `
                 -Headers @{ Accept = 'application/json' } `
-                -Body "username=$($credentials.username)&password=$($credentials.Password)&format=json$oneTimePasswordBody" `
+                -Body $body `
                 -WebSession $this.Session `
                 -SkipCertificateCheck:$this.SkipCertificateCheck
 
@@ -100,12 +109,11 @@ class NctSessionManager {
         }
         catch [System.Security.Authentication.AuthenticationException] {
             $this.Cleanup()
-            throw "Authentication failed: Invalid credentials"
+            throw "Authentication failed: $_"
         }
         catch {
             $this.Cleanup()
-            Write-Verbose "Error details: $_"
-            throw "Authentication failed: $_"
+            throw "Unknown connection failure: $_"
         }
     }
 
@@ -167,7 +175,7 @@ class NctSessionManager {
     }
 
     [string] Check2FA([System.Net.NetworkCredential]$ApiCredential) {
-        $uri = "$($this.HubUrl)/api/users/twoFactorStatus" 
+        $uri = "$($this.HubUrl)/users/twoFactorStatus" 
         try {
             Write-Verbose "Checking if 2FA is required"                     
 
@@ -191,23 +199,17 @@ class NctSessionManager {
             if ($result.TwoFactorRequired) { 
                 if ($result.TwoFactorRegistration -eq "Registering") {
                     Write-Verbose "2 Factor Authentication is required"
-                    Write-Output "Using an authenticator app on your mobile device (eg Google Authenticator, Authy, LastPass, iPhone etc) scan the QR barcode found at the link below: "
-                    Write-Output ""
-                    Write-Output "$($result.SetupImageUrl)"
-                    Write-Output ""
-                    Write-Output "Alternatively manually enter the setup code below into the authenticator app to register Change Tracker with your mobile device: $($result.SetupCode)"
-                    Write-Output ""
+                    Write-Host "Using an authenticator app on your mobile device (eg Google Authenticator, Authy, LastPass, iPhone etc) scan the QR barcode found at the link below: "
+                    Write-Host ""
+                    Write-Host "$($result.SetupImageUrl)"
+                    Write-Host ""
+                    Write-Host "Alternatively manually enter this setup code into the authenticator app to register Change Tracker with your mobile device: $($result.SetupCode)"
+                    Write-Host ""
                     Read-Host "Press Enter when you have completed the 2FA setup"
-                }
-  
-                if ($result.TwoFactorRegistration -eq "Registered") {
-                    $OneTimePassword = Read-Host "Enter the one-time password from your authenticator app"
-                    return $OneTimePassword
-                }
-
-                # Return null to indicate that 2fa is required but the user is not registered yet
-                Write-Output "User is not registered for 2FA"
-                return $null
+                }  
+                
+                $OneTimePassword = Read-Host "Enter the one-time password from your authenticator app"
+                return $OneTimePassword                
             }   
             else {
                 Write-Verbose "2FA is not required"
