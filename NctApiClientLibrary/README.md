@@ -126,6 +126,48 @@ New-NctSession -url "https://192.168.0.10/api" -user "admin" -SkipCertificateChe
 
 ```
 
+### Two-Factor Authentication (2FA)
+
+The client library now supports Two-Factor Authentication for enhanced security. When connecting to a Change Tracker Hub that has 2FA enabled for your user account, the authentication flow will automatically handle the 2FA requirements.
+
+#### First-Time 2FA Setup
+
+If 2FA is required but not yet configured for your account, the client library will guide you through the setup process:
+
+1. A QR code will be displayed as a base64 data image for scanning with your authenticator app when opened in a browser
+2. Alternatively, a manual setup code will be provided
+3. You'll be prompted to complete the setup in your authenticator app
+4. After setup, you'll enter the one-time password to complete authentication
+
+Example output during first-time setup:
+```
+Using an authenticator app on your mobile device (eg Google Authenticator, Authy, LastPass, iPhone etc) scan the QR barcode found at the link below:
+
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALcAAAC3AQAAAAB4FfIyAAADTUlEQVR4nO2YMa6kMAyGjSjSwQUi5RrpciXmAsBcAK6UjmtE4gLQpYjw...
+
+Alternatively manually enter this setup code into the authenticator app to register Change Tracker with your mobile device: ABCD EFGH IJKL MNOP
+
+Press Enter when you have completed the 2FA setup:
+Enter the one-time password from your authenticator app: 123456
+```
+
+#### Subsequent Authentications
+
+After initial setup, you'll only need to provide the one-time password from your authenticator app when prompted:
+
+```
+Enter the one-time password from your authenticator app: 123456
+```
+
+#### Supported Authenticator Apps
+
+The 2FA implementation works with any TOTP (Time-based One-Time Password) compatible authenticator app, including:
+- Google Authenticator
+- Authy
+- LastPass Authenticator
+- Microsoft Authenticator
+- Built-in authenticators (iPhone, etc.)
+
 ### Global Variables
 
 Use the following snippet to view the global variables used to hold session settings.
