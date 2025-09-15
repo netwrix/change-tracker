@@ -179,18 +179,20 @@ class NctSessionManager {
         try {
             Write-Verbose "Checking if 2FA is required"                     
 
-            $body = 
-@"
-{    
-    "UserName": "$($ApiCredential.UserName)",
-    "Password": "$($ApiCredential.Password)"
-}
-"@
+            $body = @{
+                "UserName" = $($ApiCredential.UserName)
+                "Password" = $($ApiCredential.Password)
+            }
+
+            $headers = @{
+                "Accept" = "application/json"
+            }
   
             $result = Invoke-RestMethod `
                 -Method Post `
                 -Uri $uri `
                 -ContentType application/json `
+                -Headers $headers `
                 -Body $body `
                 -SkipCertificateCheck:$this.SkipCertificateCheck
 
