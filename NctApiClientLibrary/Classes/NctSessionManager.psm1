@@ -21,6 +21,11 @@ class NctSessionManager {
 
     # Constructor
     NctSessionManager([string]$HubUrl, [string]$Username, [bool]$SkipCertificateCheck = $false) {
+        # Enforce HTTPS
+        if (-not $HubUrl.StartsWith("https://")) {
+            throw "Insecure connection: Only HTTPS endpoints are allowed. Refusing to connect to $HubUrl"
+        }
+        
         $this.HubUrl = $HubUrl
         $this.Username = $Username
         $this.SkipCertificateCheck = $SkipCertificateCheck
@@ -45,17 +50,14 @@ class NctSessionManager {
             $oneTimePassword = $this.Check2FA($credentials)
 
             # Build request 
-            $body = 
-@"
-{
-    "UserName": $($credentials.username),
-    "Password": $($credentials.Password),
-    "RememberMe": false,
-    "Meta": {
-        "OneTimePassword": $oneTimePassword
-    }
-}
-"@
+            $body = @{
+                "UserName" = $credentials.username
+                "Password" = $credentials.Password
+                "RememberMe" = false
+                "Meta" = @{
+                    "OneTimePassword" = $oneTimePassword
+                }
+            } | ConvertTo-Json
             
             # Create new session
             $uri = "$($this.HubUrl)/auth/credentials"
@@ -182,17 +184,13 @@ class NctSessionManager {
             $body = @{
                 "UserName" = $($ApiCredential.UserName)
                 "Password" = $($ApiCredential.Password)
-            }
-
-            $headers = @{
-                "Accept" = "application/json"
-            }
+            } | ConvertTo-Json
   
             $result = Invoke-RestMethod `
                 -Method Post `
                 -Uri $uri `
                 -ContentType application/json `
-                -Headers $headers `
+                -Headers @{ Accept = 'application/json' } `
                 -Body $body `
                 -SkipCertificateCheck:$this.SkipCertificateCheck
 
