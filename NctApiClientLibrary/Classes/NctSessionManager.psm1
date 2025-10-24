@@ -16,7 +16,7 @@ class NctSessionManager {
     [string]$Username
     [Microsoft.PowerShell.Commands.WebRequestSession]$Session
     [datetime]$SessionCreatedTime
-    [int]$SessionTimeoutMinutes = 10
+    [int]$SessionTimeoutMinutes = 1
     [bool]$SkipCertificateCheck
 
     # Constructor
@@ -53,7 +53,7 @@ class NctSessionManager {
             $body = @{
                 "UserName" = $credentials.username
                 "Password" = $credentials.Password
-                "RememberMe" = false
+                "RememberMe" = "false"
                 "Meta" = @{
                     "OneTimePassword" = $oneTimePassword
                 }
