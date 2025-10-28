@@ -16,7 +16,7 @@ class NctSessionManager {
     [string]$Username
     [Microsoft.PowerShell.Commands.WebRequestSession]$Session
     [datetime]$SessionCreatedTime
-    [int]$SessionTimeoutMinutes = 1
+    [int]$SessionTimeoutMinutes = 10
     [bool]$SkipCertificateCheck
 
     # Constructor
