@@ -21,6 +21,9 @@ New-NctSession -url "https://localhost/api" -user "admin" -SkipCertificateCheck
 For automated builds and CI runs pass a credential from a password store into the script below to ensure the test run is able to initialise sessions.
 
 ```powershell
+# Pass the username in from a pipeline variable
+$user = "MyUsername"
+
 # Create a directory to store the encrypted password file in
 $path = "$env:USERPROFILE\.nct client library"
 New-Item -Path $path -ItemType Directory | Out-Null
