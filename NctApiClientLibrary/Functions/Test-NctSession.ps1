@@ -43,8 +43,8 @@ Function Test-NctSession {
             New-Item -Path "$env:USERPROFILE\.nct client library" -ItemType Directory
         }
 
-        # If text files found in $env:USERPROFILE\.nct client library then print a numbered list for the user to select which to load
-        $files = Get-ChildItem -Path "$env:USERPROFILE\.nct client library" -Filter "*.txt" | Select-Object -ExpandProperty Name
+        # If credential files found in $env:USERPROFILE\.nct client library then print a numbered list for the user to select which to load
+        $files = Get-ChildItem -Path "$env:USERPROFILE\.nct client library" -Filter "*.dat" | Select-Object -ExpandProperty Name
         if ($files.Count -gt 0)
         {
             Write-Host "The following credential files were found in $env:USERPROFILE\.nct client library:"

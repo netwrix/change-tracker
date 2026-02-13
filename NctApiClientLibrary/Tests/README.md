@@ -64,11 +64,20 @@ Naviage to the Tests directory and invoke all tests with `Invoke-Pester`.
 
 Example output:
 ```
-Starting discovery in 2 files.
-Discovery found 8 tests in 10.51s.
+Starting discovery in 4 files.
+Discovery found 30+ tests in 12.5s.
 Running tests.
 [+] C:\dev\change-tracker\NctApiClientLibrary\Tests\Credentials.Tests.ps1 9.66s (1.78s|327ms)
+[+] C:\dev\change-tracker\NctApiClientLibrary\Tests\CredentialPersistence.Tests.ps1 5.43s (2.12s|154ms)
 [+] C:\dev\change-tracker\NctApiClientLibrary\Tests\Devices.Tests.ps1 7.21s (4.21s|64ms)
-Tests completed in 16.88s
-Tests Passed: 8, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+[+] C:\dev\change-tracker\NctApiClientLibrary\Tests\SessionCredentialDiscovery.Tests.ps1 6.89s (3.45s|201ms)
+Tests completed in 29.19s
+Tests Passed: 30, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 ```
+
+### Test Files
+
+- **Credentials.Tests.ps1** - Integration tests for adding, retrieving, and deleting database credentials via the API
+- **CredentialPersistence.Tests.ps1** - Unit tests for credential file persistence, encryption, and the .dat file extension
+- **Devices.Tests.ps1** - Integration tests for proxied device management
+- **SessionCredentialDiscovery.Tests.ps1** - Tests for the credential file discovery logic, including regression tests for the file extension bug
